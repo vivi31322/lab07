@@ -80,7 +80,7 @@ _deps
 
 .DS_STORE
 
-
+obj/
 .bsp/
 generated/
 out/
