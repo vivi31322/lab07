@@ -1,1 +1,11 @@
 ## RV32 Emulator Testing Assembly Code for MULHU function
+
+main:
+addi x28,x0,-48     
+addi x29,x0,48     
+mulhu x30,x28,x29    
+hcf
+
+#ffffffd0 = 4294967248(Base 10)
+#00000030 = 48(Base 10)
+#4294967248 × 48 = 206158427904(Base 10) = 2ffffff700(Hex)

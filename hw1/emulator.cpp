@@ -103,8 +103,8 @@ typedef enum {
 instr_type parse_instr(char* tok) {
 	//instruction added
 	if ( streq(tok , "mul")) return MUL;
-  if ( streq(tok , "mulh")) return MULH;
-	if ( streq(tok , "mulhsu")) return MULHSU;
+  //if ( streq(tok , "mulh")) return MULH;
+	//if ( streq(tok , "mulhsu")) return MULHSU;
 	if ( streq(tok , "mulhu")) return MULHU;
 	/*if ( streq(tok , "div")) return DIV;
 	if ( streq(tok , "divu")) return DIVU;
@@ -539,18 +539,13 @@ int parse_instr(int line, char* ftok, instr* imem, int memoff, label_loc* labels
 			case UNIMPL: return 1;
 
 			//instruction added
-			// case MUL:
-			//     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
-			// 	    i->a1.reg = parse_reg(o1 , line);
-			// 	    i->a2.reg = parse_reg(o2 , line);
-			// 	    i->a3.reg = parse_reg(o3 , line);
-			//     return 1;
-			case MUL:
+			 case MUL:
 			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
 			 	    i->a1.reg = parse_reg(o1 , line);
 			 	    i->a2.reg = parse_reg(o2 , line);
 			 	    i->a3.reg = parse_reg(o3 , line);
 			     return 1;
+			
 			case MULH:
 			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
 			 	    i->a1.reg = parse_reg(o1 , line);
