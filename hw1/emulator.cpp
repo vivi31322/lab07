@@ -49,6 +49,14 @@ typedef enum {
 	UNIMPL = 0,
 
 	//instruction added
+	MUL,
+	MULH,
+	MULHSU,
+	MULHU,
+	DIV,
+	DIVU,
+	REM,
+	REMU,
     //MUL,
     //*****************
 
@@ -94,6 +102,14 @@ typedef enum {
 
 instr_type parse_instr(char* tok) {
 	//instruction added
+	if ( streq(tok , "mul")) return MUL;
+  if ( streq(tok , "mulh")) return MULH;
+	if ( streq(tok , "mulhsu")) return MULHSU;
+	if ( streq(tok , "mulhu")) return MULHU;
+	/*if ( streq(tok , "div")) return DIV;
+	if ( streq(tok , "divu")) return DIVU;
+	*/if ( streq(tok , "rem")) return REM;
+	if ( streq(tok , "remu")) return REMU;
     //if ( streq(tok , "mul")) return MUL;
     //*****************
 
@@ -529,6 +545,55 @@ int parse_instr(int line, char* ftok, instr* imem, int memoff, label_loc* labels
 			// 	    i->a2.reg = parse_reg(o2 , line);
 			// 	    i->a3.reg = parse_reg(o3 , line);
 			//     return 1;
+			case MUL:
+			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
+			 	    i->a1.reg = parse_reg(o1 , line);
+			 	    i->a2.reg = parse_reg(o2 , line);
+			 	    i->a3.reg = parse_reg(o3 , line);
+			     return 1;
+			case MULH:
+			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
+			 	    i->a1.reg = parse_reg(o1 , line);
+			 	    i->a2.reg = parse_reg(o2 , line);
+			 	    i->a3.reg = parse_reg(o3 , line);
+			     return 1;
+			case MULHSU:
+			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
+			 	    i->a1.reg = parse_reg(o1 , line);
+			 	    i->a2.reg = parse_reg(o2 , line);
+			 	    i->a3.reg = parse_reg(o3 , line);
+			     return 1;
+			case MULHU:
+			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
+			 	    i->a1.reg = parse_reg(o1 , line);
+			 	    i->a2.reg = parse_reg(o2 , line);
+			 	    i->a3.reg = parse_reg(o3 , line);
+			     return 1;
+			/*case DIV:
+			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
+			 	    i->a1.reg = parse_reg(o1 , line);
+			 	    i->a2.reg = parse_reg(o2 , line);
+			 	    i->a3.reg = parse_reg(o3 , line);
+			     return 1;
+			case DIVU:
+			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
+			 	    i->a1.reg = parse_reg(o1 , line);
+			 	    i->a2.reg = parse_reg(o2 , line);
+			 	    i->a3.reg = parse_reg(o3 , line);
+			     return 1;
+			*/case REM:
+			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
+			 	    i->a1.reg = parse_reg(o1 , line);
+			 	    i->a2.reg = parse_reg(o2 , line);
+			 	    i->a3.reg = parse_reg(o3 , line);
+			     return 1;
+			case REMU:
+			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
+				 //if ( (o1 == o2) || (o1 == o3)  ) print_syntax_error( line,  "Invalid format" );
+			 	    i->a1.reg = parse_reg(o1 , line);
+			 	    i->a2.reg = parse_reg(o2 , line);
+			 	    i->a3.reg = parse_reg(o3 , line);
+			     return 1;
 			//****************
 
 			case JAL:
@@ -765,6 +830,38 @@ void execute(uint8_t* mem, instr* imem, label_loc* labels, int label_count, bool
 		switch (i.op) {
 
 			//instruction added
+			case MUL: rf[i.a1.reg] = rf[i.a2.reg] * rf[i.a3.reg]; break;
+      case MULH: rf[i.a1.reg] = (((int64_t)(*(int32_t*)&rf[i.a2.reg])) * ((int64_t)(int32_t)rf[i.a3.reg]))  >> 32; break;
+			case MULHU: rf[i.a1.reg] = ((uint64_t)rf[i.a2.reg] * (uint64_t)rf[i.a3.reg])>>32; break;
+			case MULHSU: rf[i.a1.reg] = ((int64_t)((int32_t)rf[i.a2.reg]) * rf[i.a3.reg])>>32; break;
+			/*case DIV:
+				if (rf[i.a3.reg]==0){
+					
+					break;
+				}	
+				rf[i.a1.reg] = (*(int32_t*)&rf[i.a2.reg]) / (*(int32_t*)&rf[i.a3.reg]); break;
+			case DIVU:
+				if(rf[i.a3.reg]==0){
+					break;
+				}
+				rf[i.a1.reg] = rf[i.a2.reg] / rf[i.a3.reg]; break;
+			*/case REM: 
+				if(rf[i.a3.reg]==0){
+					rf[i.a1.reg] = rf[i.a2.reg];
+					break;
+				}
+				if((rf[i.a3.reg]==0xffffffff)&&(rf[i.a2.reg]==0x80000000)){
+					rf[i.a1.reg] = rf[i.a2.reg];
+					//printf("got it -1\n");
+					break;
+				}
+				rf[i.a1.reg] = (*(int32_t*)&rf[i.a2.reg]) % (*(int32_t*)&rf[i.a3.reg]); break;
+			case REMU: 
+				if(rf[i.a3.reg]==0){
+					rf[i.a1.reg] = rf[i.a2.reg];
+					break;
+				}
+				rf[i.a1.reg] = (uint32_t)rf[i.a2.reg] % (uint32_t)rf[i.a3.reg]; break;
       		//case MUL: rf[i.a1.reg] = rf[i.a2.reg] * rf[i.a3.reg]; break;
       		//*****************
 
