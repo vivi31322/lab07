@@ -49,7 +49,10 @@ typedef enum {
 	UNIMPL = 0,
 
 	//instruction added
-    //MUL,
+  MUL,
+	SH1ADD,
+	SH2ADD,
+	SH3ADD,
     //*****************
 
 	ADD,
@@ -94,7 +97,10 @@ typedef enum {
 
 instr_type parse_instr(char* tok) {
 	//instruction added
-    //if ( streq(tok , "mul")) return MUL;
+	if (streq(tok, "sh1add")) return SH1ADD;
+	if (streq(tok, "sh2add")) return SH2ADD;
+	if (streq(tok, "sh3add")) return SH3ADD;
+  if ( streq(tok , "mul")) return MUL;
     //*****************
 
 	if ( streq(tok, "add") ) return ADD;
@@ -529,6 +535,12 @@ int parse_instr(int line, char* ftok, instr* imem, int memoff, label_loc* labels
 			// 	    i->a2.reg = parse_reg(o2 , line);
 			// 	    i->a3.reg = parse_reg(o3 , line);
 			//     return 1;
+			case SH1ADD:case SH2ADD:case SH3ADD:
+			     if ( !o1 || !o2 || !o3 || o4 ) print_syntax_error( line,  "Invalid format" );
+			 	    i->a1.reg = parse_reg(o1 , line);
+			 	    i->a2.reg = parse_reg(o2 , line);
+			 	    i->a3.reg = parse_reg(o3 , line);
+			     return 1;
 			//****************
 
 			case JAL:
@@ -764,8 +776,17 @@ void execute(uint8_t* mem, instr* imem, label_loc* labels, int label_count, bool
 		int pc_next = pc + 4;
 		switch (i.op) {
 
-			//instruction added
-      		//case MUL: rf[i.a1.reg] = rf[i.a2.reg] * rf[i.a3.reg]; break;
+			//instruction added X(rd) = X(rs2) + (X(rs1) << 2)
+			case SH1ADD:
+				rf[i.a1.reg] = rf[i.a3.reg] + (rf[i.a2.reg] << 1);
+				break;
+			case SH2ADD:
+				rf[i.a1.reg] = rf[i.a3.reg] + (rf[i.a2.reg] << 2);
+				break;
+			case SH3ADD:
+				rf[i.a1.reg] = rf[i.a3.reg] + (rf[i.a2.reg] << 3);
+				break;
+      case MUL: rf[i.a1.reg] = rf[i.a2.reg] * rf[i.a3.reg]; break;
       		//*****************
 
 			case ADD: rf[i.a1.reg] = rf[i.a2.reg] + rf[i.a3.reg]; break;
