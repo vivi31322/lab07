@@ -846,7 +846,8 @@ void execute(uint8_t* mem, instr* imem, label_loc* labels, int label_count, bool
 					break;
 				}
 				if((rf[i.a3.reg]==0xffffffff)&&(rf[i.a2.reg]==0x80000000)){
-					rf[i.a1.reg] = rf[i.a2.reg];
+					rf[i.a1.reg] = 0;
+					//rf[i.a2.reg];
 					//printf("got it -1\n");
 					break;
 				}
